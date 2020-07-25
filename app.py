@@ -119,7 +119,8 @@ def delete_todo(todo_id):
         db.session.close()
     return jsonify({'success': True})
 
-# creating a route handler for displaying todos assosciated to a specific todo list id.
+# creating a route handler for displaying todos assosciated to a specific todo list id. Also passing active todo list name and all todo lists 
+# which will be displayed on the left hand side.
 @app.route('/lists/<list_id>')
 def get_list_todos(list_id):
     '''
@@ -130,7 +131,10 @@ def get_list_todos(list_id):
     content in html files. It processes the entire file to replace the template strings that were in your html files with
     strings and then render an html file to the user. This variable data is a list of objects.
     '''
-    return render_template('index.html', data=Todo.query.filter_by(list_id=list_id).order_by('id').all())
+    return render_template('index.html', 
+                           todo_lists = TodoList.query.all(),
+                           active_todo_list = TodoList.query.get(list_id),
+                           todos=Todo.query.filter_by(list_id=list_id).order_by('id').all())
 
 # creating a route handler for the homepage which will redirect to page which will show all todos for list id 1 , </lists/1>.
 @app.route('/')
