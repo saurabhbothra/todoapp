@@ -1,0 +1,131 @@
+<html>
+    <head>
+        <title>Todo App</title>
+        <style>
+            .hidden {
+                display: none;
+            }
+            .todolist {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                width: 300px;
+            }
+            .list-todo {
+                clear: both;
+            }
+            .delete-todo {
+                -webkit-appearance: none;
+                border: none;
+                outline: none;
+                color: red;
+                float: right;
+                cursor: pointer;
+                font-size: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <form id='form'>
+            <input type="text" id='description' name='description' />
+            <input type="submit" value='Create' />
+        </form>
+        <div id='error' class="hidden">Something went wrong!</div>
+        <ul id='todos' class="todolist">
+            {% for d in data %}
+                <li class="list-todo">
+                    <input class="check-completed" data-id="{{ d.id }}" type="checkbox" {% if d.completed %} checked {% endif %} /> 
+                    {{d.description}}
+                    <button class="delete-todo" data-id="{{ d.id }}">&cross;</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <script>
+            // this function will return an array of checkbox objects defined under the class check-completed.
+            const checkboxes = document.querySelectorAll('.check-completed');
+            for(let i = 0; i < checkboxes.length; i++) {
+                const checkbox = checkboxes[i];
+                // we are storing an event handler to the onchange attribute of every checkbox object. So if a user
+                // clicks on that checkbox, an event registered for that checkbox at the appropriate handler will be executed.
+                // we need to send the fetch update request in this handler.
+                checkbox.onchange = function(e) {
+                    console.log('event', e);
+                    // the event object has a target property which contains a checked property which tells us the new updated state of that checkbox.
+                    const newCompleted = e.target.checked;
+                    // getting the todo id for which we need to update the completed attribute.
+                    const todoId = e.target.dataset['id'];
+                    // creating a fetch - update request.
+                    fetch('/todos/' + todoId + '/set-completed', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            'completed': newCompleted
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(function() {
+                        document.getElementById('error').className = 'hidden';
+                    }).catch(function() {
+                        document.getElementById('error').className = '';
+                    });
+                }
+            }
+
+            // this function will return an array of delete button objects defined under the class delete-todo.
+            const deleteBtns = document.querySelectorAll('.delete-todo');
+            for(let i = 0; i < deleteBtns.length; i++) {
+                const btn = deleteBtns[i];
+                // we are storing an event handler to the onclick attribute of every delete button object. So if a 
+                // user clicks on that button, an event registered for that delete button at the appropriate handler will be executed.
+                // we need to send the fetch delete request in this handler.
+                btn.onclick = function(e) {
+                    // getting the todo id for which we need to delete the todo object.
+                    const todoId = e.target.dataset['id'];
+                    // creating a fetch - delete request.
+                    fetch('/todos/' + todoId + '/delete', {
+                        method: 'DELETE'
+                    }).then(function(response){
+                        return response.json();
+                    }).then(function(jsonResponse){
+                        console.log('Delete successful: ',jsonResponse['success']);
+                        document.getElementById('error').className='hidden';
+                    }).catch(function() {
+                        document.getElementById('error').className = '';
+                    });
+                }
+            }
+
+            // event handler when the user clicks on the submit button of the form.
+            document.getElementById('form').onsubmit = function(e) {
+                // preventing the default behaviour. the event object would have done a full page refresh and then submitted the request which we want to avoid.
+                e.preventDefault();
+                // fetch is a promise based library. After sending the request, it is going to give back a promise by which we can then use the then method which in the then 
+                // callback should give us back a response. We then want to parse out the response which will initially be a string as a JSON response
+                // and then we will manipulate the JSON response that comes out of here.
+                // if something goes wrong, the catch handler will be executed.
+                fetch('/todos/create', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        'description': document.getElementById('description').value
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(function(response){
+                    return response.json();
+                }).then(function(jsonResponse){
+                    console.log(jsonResponse);
+                    // we need to take care of appending the newly inserted record to the todo list so that it can be seen on the ui.
+                    // creating a new LI item object.
+                    const liItem = document.createElement('LI');
+                    liItem.innerHTML = jsonResponse['description'];
+                    // appending the li item object to the unorder list.
+                    document.getElementById('todos').appendChild(liItem);
+                    document.getElementById('error').className='hidden';
+                }).catch(function(){
+                    document.getElementById('error').className='';
+                });
+            }
+        </script>
+    </body>
+</html>
