@@ -28,7 +28,7 @@ migrate = Migrate(app, db)
 class TodoList(db.Model):
     __tablename__ = 'todolists'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String(), nullable=False, unique=True)
     todos = db.relationship('Todo', backref='todo_list_name', lazy=True)
     
     def __repr__(self):
@@ -64,6 +64,25 @@ def create_todo():
     return redirect(url_for('index'))
 
 '''
+
+# creating a route handler for displaying a form to create a new todo list.
+@app.route('/create/list/form')
+def create_todo_list_form():
+    return render_template('createtodolist.html')
+
+# creating a route handler for adding a new todo list to the database and then displaying it with its respective todos in home page.
+@app.route('/todos/create/list', methods=['POST'])
+def create_new_todo_list():
+    try:
+        name = request.form.get('todo-list-name')
+        todo_list = TodoList(name=name)
+        db.session.add(todo_list)
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for('index'))
 
 # ajax version.
 # creating a route handler for creating a new todo record.

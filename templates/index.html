@@ -5,16 +5,22 @@
             .hidden {
                 display: none;
             }
-            .todolist, .tlists {
+            .tlists {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                width: 200px;
+            }
+            .todolist {
                 list-style: none;
                 padding: 0;
                 margin: 0;
                 width: 300px;
             }
-            .list-todo {
+            .list-todo, .list-todo-lists {
                 clear: both;
             }
-            .delete-todo {
+            .delete-todo, .delete-todo-list {
                 -webkit-appearance: none;
                 border: none;
                 outline: none;
@@ -23,7 +29,7 @@
                 cursor: pointer;
                 font-size: 20px;
             }
-            .lists-wrapper, .todos-wrapper {
+            .lists-wrapper, .todos-wrapper, .dummy {
                 display: inline-block;
                 vertical-align: top;
             }
@@ -31,21 +37,29 @@
     </head>
     <body>
         <div class="lists-wrapper">
+            <h2>Lists</h2>
+            <a href="/create/list/form"><h3>Create a List</h3></a>
             <ul id="todo-lists" class="tlists">
                 {% for todo_list in todo_lists %}
-                    <li>
+                    <li class="list-todo-lists">
                         <a href="/lists/{{ todo_list.id }}">
                             {{ todo_list.name }}
                         </a>
+                        <button class="delete-todo-list" data-id="{{ todo_list.id }}">&cross;</button>
                     </li>
                 {% endfor %}
             </ul>
         </div>
+        <div class="dummy">
+            &emsp14;&MediumSpace;
+        </div>
         <div class="todos-wrapper">
-            <h4>{{ active_todo_list.name }}</h4>
+            <h3>{{ active_todo_list.name }}</h3>
+            <a href=""><h4>Rename</h4></a>
             <form id='form'>
                 <input type="text" id='description' name='description' />
-                <input type="submit" value='Create' />
+                <input type="submit" value='Create' /><br><br>
+                <input type="text" id='search' name='search' placeholder="Search" />
             </form>
             <div id='error' class="hidden">Something went wrong!</div>
             <ul id='todos' class="todolist">
