@@ -70,6 +70,25 @@ def create_todo():
 def create_todo_list_form():
     return render_template('createtodolist.html')
 
+# creating a route handler for displaying a form for renaming the active todo list.
+@app.route('/todos/list/<active_todo_list_id>/form')
+def display_form_rename_active_todo_list(active_todo_list_id):
+    return render_template('renameactivetodolist.html', active_todo_list_id=active_todo_list_id)
+
+# creating a route handler for renaming the active todo list.
+@app.route('/todos/active/list/<active_todo_list_id>/rename', methods=['POST'])
+def rename_active_todo_list(active_todo_list_id):
+    try:
+        active_todo_list = TodoList.query.get(active_todo_list_id)
+        name = request.form.get('new-todo-list-name')
+        active_todo_list.name = name
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for('get_list_todos', list_id=active_todo_list_id))
+
 # creating a route handler for adding a new todo list to the database and then displaying it with its respective todos in home page.
 @app.route('/todos/create/list', methods=['POST'])
 def create_new_todo_list():

@@ -55,7 +55,7 @@
         </div>
         <div class="todos-wrapper">
             <h3>{{ active_todo_list.name }}</h3>
-            <a href=""><h4>Rename</h4></a>
+            <a href="/todos/list/{{ active_todo_list.id }}/form"><h4>Rename</h4></a>
             <form id='form'>
                 <input type="text" id='description' name='description' />
                 <input type="submit" value='Create' /><br><br>

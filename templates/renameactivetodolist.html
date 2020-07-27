@@ -1,0 +1,11 @@
+<html>
+    <head>
+        <title>Rename Active Todo List</title>
+    </head>
+    <body>
+        <form id='rename-todo-list-form' action="/todos/active/list/{{ active_todo_list_id }}/rename" method="POST">
+            Rename Active Todo List <input type="text" id='new-todo-list-name' name='new-todo-list-name' required /> <br><br>
+            <input type="submit" id="submit" value='Rename' />
+        </form>
+    </body>
+</html>
