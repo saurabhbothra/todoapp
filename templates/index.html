@@ -56,9 +56,8 @@
         <div class="todos-wrapper">
             <h3>{{ active_todo_list.name }}</h3>
             <a href="/todos/list/{{ active_todo_list.id }}/form"><h4>Rename</h4></a>
+            <a href="/list/{{ active_todo_list.id }}/todos/create/form"><h4>Add To-Do</h4></a>
             <form id='form'>
-                <input type="text" id='description' name='description' />
-                <input type="submit" value='Create' /><br><br>
                 <input type="text" id='search' name='search' placeholder="Search" />
             </form>
             <div id='error' class="hidden">Something went wrong!</div>
@@ -116,17 +115,19 @@
                     // creating a fetch - delete request.
                     fetch('/todos/' + todoId + '/delete', {
                         method: 'DELETE'
-                    }).then(function(response){
-                        return response.json();
-                    }).then(function(jsonResponse){
-                        console.log('Delete successful: ',jsonResponse['success']);
+                    }).then(function(){
+                        console.log('Delete successful!!');
                         document.getElementById('error').className='hidden';
+                        // reloading the current web page after the delete is successfull.
+                        location.reload();
                     }).catch(function() {
                         document.getElementById('error').className = '';
                     });
                 }
             }
 
+            /**
+             * ajax version of create todo.
             // event handler when the user clicks on the submit button of the form.
             document.getElementById('form').onsubmit = function(e) {
                 // preventing the default behaviour. the event object would have done a full page refresh and then submitted the request which we want to avoid.
@@ -158,6 +159,7 @@
                     document.getElementById('error').className='';
                 });
             }
+            */
         </script>
     </body>
 </html>

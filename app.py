@@ -49,22 +49,6 @@ class Todo(db.Model):
 # in the future.
 # db.create_all()
 
-'''
-non - ajax version
-# creating a route handler for creating a new todo record.
-@app.route('/todos/create', methods=['POST'])
-def create_todo():
-    # getting the value of description and todoid from form. If the value is empty for description, then use default value which is a empty string.
-    description = request.form.get('description', '')
-    # creating a new todo object and inserting it in our database.
-    todo = Todo(description=description)
-    db.session.add(todo)
-    db.session.commit()
-    # after successful insertion of record, we can redirect to our home page. index is the route handler for our home page.
-    return redirect(url_for('index'))
-
-'''
-
 # creating a route handler for displaying a form to create a new todo list.
 @app.route('/create/list/form')
 def create_todo_list_form():
@@ -74,6 +58,27 @@ def create_todo_list_form():
 @app.route('/todos/list/<active_todo_list_id>/form')
 def display_form_rename_active_todo_list(active_todo_list_id):
     return render_template('renameactivetodolist.html', active_todo_list_id=active_todo_list_id)
+
+# creating a route handler for displaying a form for creating a todo.
+@app.route('/list/<active_todo_list_id>/todos/create/form')
+def display_form_create_todo(active_todo_list_id):
+    return render_template('createtodo.html', active_todo_list_id=active_todo_list_id)
+
+# creating a route handler for creating a todo and assosciating that todo with the right todo list.
+@app.route('/list/<active_todo_list_id>/todos/create', methods=['POST'])
+def create_todo(active_todo_list_id):
+    try:
+        description = request.form.get('description', '')
+        active_todo_list = TodoList.query.get(active_todo_list_id)
+        new_todo = Todo(description=description)
+        new_todo.todo_list_name = active_todo_list
+        db.session.add(new_todo)
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for('get_list_todos', list_id=active_todo_list_id))
 
 # creating a route handler for renaming the active todo list.
 @app.route('/todos/active/list/<active_todo_list_id>/rename', methods=['POST'])
@@ -105,6 +110,7 @@ def create_new_todo_list():
 
 # ajax version.
 # creating a route handler for creating a new todo record.
+'''
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
     error = False
@@ -127,6 +133,7 @@ def create_todo():
         return jsonify(body)
     else:
         abort(400)
+'''
         
 # ajax version.
 # create a route handler for updating the completed state of a todo item.

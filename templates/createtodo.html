@@ -1,0 +1,11 @@
+<html>
+    <head>
+        <title>Rename Active Todo List</title>
+    </head>
+    <body>
+        <form id='form' method="POST" action="/list/{{ active_todo_list_id }}/todos/create">
+            Enter To-Do Description: <input type="text" id='description' name='description' /><br><br>
+            <input type="submit" value='Create' />
+        </form>
+    </body>
+</html>
