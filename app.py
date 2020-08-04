@@ -94,6 +94,21 @@ def rename_active_todo_list(active_todo_list_id):
         db.session.close()
     return redirect(url_for('get_list_todos', list_id=active_todo_list_id))
 
+# creating a route handler for marking all todos completed.
+@app.route('/list/<active_list_id>/complete/all/todos')
+def complete_all_todos(active_list_id):
+    try:
+        todos = Todo.query.filter_by(list_id=active_list_id).all()
+        for todo in todos:
+            if todo.completed == False:
+                todo.completed = True
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for('get_list_todos', list_id=active_list_id))
+
 # creating a route handler for adding a new todo list to the database and then displaying it with its respective todos in home page.
 @app.route('/todos/create/list', methods=['POST'])
 def create_new_todo_list():

@@ -73,6 +73,9 @@
                         </li>
                     {% endfor %}
                 </ul>
+                {% if todos %}
+                    <a href="/list/{{ active_todo_list.id }}/complete/all/todos"><h4>Complete All</h4></a>
+                {% endif %}
             </div>
         {% endif %}
         <script>
