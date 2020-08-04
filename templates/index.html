@@ -126,6 +126,31 @@
                 }
             }
 
+
+            // this function will return an array of delete button objects defined under the class delete-todo-list.
+            const deleteTodoListBtns = document.querySelectorAll('.delete-todo-list');
+            for(let i = 0; i < deleteTodoListBtns.length; i++) {
+                const btn = deleteTodoListBtns[i];
+                // we are storing an event handler to the onclick attribute of every delete button object. So if a 
+                // user clicks on that button, an event registered for that delete button at the appropriate handler will be executed.
+                // we need to send the fetch delete request in this handler.
+                btn.onclick = function(e) {
+                    // getting the todo id for which we need to delete the todo object.
+                    const activeTodoListId = e.target.dataset['id'];
+                    // creating a fetch - delete request.
+                    fetch('/list/todos/' + activeTodoListId + '/delete', {
+                        method: 'DELETE'
+                    }).then(function(){
+                        console.log('Delete successful!!');
+                        document.getElementById('error').className='hidden';
+                        // reloading the current web page after the delete is successfull.
+                        location.reload();
+                    }).catch(function() {
+                        document.getElementById('error').className = '';
+                    });
+                }
+            }
+
             /**
              * ajax version of create todo.
             // event handler when the user clicks on the submit button of the form.

@@ -29,7 +29,7 @@ class TodoList(db.Model):
     __tablename__ = 'todolists'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False, unique=True)
-    todos = db.relationship('Todo', backref='todo_list_name', lazy=True)
+    todos = db.relationship('Todo', backref='todo_list_name', lazy=True, cascade='all, delete')
     
     def __repr__(self):
         return f'<TodoList {self.id} {self.name}>'
@@ -164,6 +164,20 @@ def delete_todo(todo_id):
         db.session.close()
     return jsonify({'success': True})
 
+# ajax version
+# create a route handler for deleting the entire todo list.
+@app.route('/list/todos/<todo_list_id>/delete', methods=['DELETE'])
+def delete_todo_list(todo_list_id):
+    try:
+        todo_list = TodoList.query.get(todo_list_id)
+        db.session.delete(todo_list)
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return jsonify({'success': True})
+
 # creating a route handler for displaying todos assosciated to a specific todo list id. Also passing active todo list name and all todo lists 
 # which will be displayed on the left hand side.
 @app.route('/lists/<list_id>')
@@ -176,12 +190,24 @@ def get_list_todos(list_id):
     content in html files. It processes the entire file to replace the template strings that were in your html files with
     strings and then render an html file to the user. This variable data is a list of objects.
     '''
-    return render_template('index.html', 
-                           todo_lists = TodoList.query.all(),
-                           active_todo_list = TodoList.query.get(list_id),
+    todo_lists = TodoList.query.order_by('id').all()
+    todo_list = TodoList.query.get(list_id)
+    if todo_list == None:
+        todo_list = todo_lists[0]
+        return render_template('index.html', 
+                           todo_lists = todo_lists,
+                           active_todo_list = todo_list,
+                           todos=Todo.query.filter_by(list_id=todo_list.id).order_by('id').all())    
+    return render_template('index.html',
+                           todo_lists = todo_lists,
+                           active_todo_list = todo_list,
                            todos=Todo.query.filter_by(list_id=list_id).order_by('id').all())
 
 # creating a route handler for the homepage which will redirect to page which will show all todos for list id 1 , </lists/1>.
 @app.route('/')
 def index():
-    return redirect(url_for('get_list_todos', list_id=1))
+    todo_list_data = TodoList.query.order_by('id').all()
+    for todo_list in todo_list_data:
+        if todo_list.id == 1:
+            return redirect(url_for('get_list_todos', list_id=1))
+    return redirect(url_for('get_list_todos', list_id=todo_list_data[0].id))
