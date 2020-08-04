@@ -148,7 +148,7 @@ def set_completed_todo(todo_id):
         db.session.rollback()
     finally:
         db.session.close()
-    return redirect(url_for('index'))
+    return jsonify({'success': True})
 
 # ajax version
 # create a route handler for deleting the todo object.
@@ -192,28 +192,29 @@ def get_list_todos(list_id):
     '''
     todo_lists = TodoList.query.order_by('id').all()
     if len(todo_lists) == 0:
-        return render_template('index.html', 
-                           todo_lists = None,
-                           active_todo_list = None,
-                           todos=None)
+        return redirect(url_for('empty_todo_lists', list_id=-1))
     todo_list = TodoList.query.get(list_id)
     if todo_list == None:
-        return render_template('index.html', 
-                           todo_lists = todo_lists,
-                           active_todo_list = todo_lists[0],
-                           todos=Todo.query.filter_by(list_id=todo_lists[0].id).order_by('id').all())    
+        return redirect(url_for('empty_todo_lists', list_id=todo_lists[0].id))    
     return render_template('index.html',
                            todo_lists = todo_lists,
                            active_todo_list = todo_list,
                            todos=Todo.query.filter_by(list_id=list_id).order_by('id').all())
 
-# creating a route handler for the homepage which will redirect to page which will show all todos for list id 1 , </lists/1>.
+# creating a route handler to handle empty todo lists and deletion of active todo list.
+@app.route('/todo/lists/<list_id>')
+def empty_todo_lists(list_id):
+    if int(list_id) == -1:
+        return render_template('index.html', 
+                           todo_lists = None,
+                           active_todo_list = None,
+                           todos=None)
+    return redirect(url_for('get_list_todos', list_id=list_id))
+
+# creating a route handler for the homepage which will redirect to page which will show all todos for smallest list id.
 @app.route('/')
 def index():
     todo_list_data = TodoList.query.order_by('id').all()
     if len(todo_list_data) == 0:
-        return redirect(url_for('get_list_todos', list_id=-1))
-    for todo_list in todo_list_data:
-        if todo_list.id == 1:
-            return redirect(url_for('get_list_todos', list_id=1))
+        return redirect(url_for('empty_todo_lists', list_id=-1))
     return redirect(url_for('get_list_todos', list_id=todo_list_data[0].id))
