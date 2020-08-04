@@ -39,38 +39,42 @@
         <div class="lists-wrapper">
             <h2>Lists</h2>
             <a href="/create/list/form"><h3>Create a List</h3></a>
-            <ul id="todo-lists" class="tlists">
-                {% for todo_list in todo_lists %}
-                    <li class="list-todo-lists">
-                        <a href="/lists/{{ todo_list.id }}">
-                            {{ todo_list.name }}
-                        </a>
-                        <button class="delete-todo-list" data-id="{{ todo_list.id }}">&cross;</button>
-                    </li>
-                {% endfor %}
-            </ul>
+            {% if todo_lists %}
+                <ul id="todo-lists" class="tlists">
+                    {% for todo_list in todo_lists %}
+                        <li class="list-todo-lists">
+                            <a href="/lists/{{ todo_list.id }}">
+                                {{ todo_list.name }}
+                            </a>
+                            <button class="delete-todo-list" data-id="{{ todo_list.id }}">&cross;</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
         <div class="dummy">
             &emsp14;&MediumSpace;
         </div>
-        <div class="todos-wrapper">
-            <h3>{{ active_todo_list.name }}</h3>
-            <a href="/todos/list/{{ active_todo_list.id }}/form"><h4>Rename</h4></a>
-            <a href="/list/{{ active_todo_list.id }}/todos/create/form"><h4>Add To-Do</h4></a>
-            <form id='form'>
-                <input type="text" id='search' name='search' placeholder="Search" />
-            </form>
-            <div id='error' class="hidden">Something went wrong!</div>
-            <ul id='todos' class="todolist">
-                {% for todo in todos %}
-                    <li class="list-todo">
-                        <input class="check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} /> 
-                        {{todo.description}}
-                        <button class="delete-todo" data-id="{{ todo.id }}">&cross;</button>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+        {% if todo_lists %}
+            <div class="todos-wrapper">
+                <h3>{{ active_todo_list.name }}</h3>
+                <a href="/todos/list/{{ active_todo_list.id }}/form"><h4>Rename</h4></a>
+                <a href="/list/{{ active_todo_list.id }}/todos/create/form"><h4>Add To-Do</h4></a>
+                <form id='form'>
+                    <input type="text" id='search' name='search' placeholder="Search" />
+                </form>
+                <div id='error' class="hidden">Something went wrong!</div>
+                <ul id='todos' class="todolist">
+                    {% for todo in todos %}
+                        <li class="list-todo">
+                            <input class="check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} /> 
+                            {{todo.description}}
+                            <button class="delete-todo" data-id="{{ todo.id }}">&cross;</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
         <script>
             // this function will return an array of checkbox objects defined under the class check-completed.
             const checkboxes = document.querySelectorAll('.check-completed');

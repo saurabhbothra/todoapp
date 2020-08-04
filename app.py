@@ -191,13 +191,17 @@ def get_list_todos(list_id):
     strings and then render an html file to the user. This variable data is a list of objects.
     '''
     todo_lists = TodoList.query.order_by('id').all()
+    if len(todo_lists) == 0:
+        return render_template('index.html', 
+                           todo_lists = None,
+                           active_todo_list = None,
+                           todos=None)
     todo_list = TodoList.query.get(list_id)
     if todo_list == None:
-        todo_list = todo_lists[0]
         return render_template('index.html', 
                            todo_lists = todo_lists,
-                           active_todo_list = todo_list,
-                           todos=Todo.query.filter_by(list_id=todo_list.id).order_by('id').all())    
+                           active_todo_list = todo_lists[0],
+                           todos=Todo.query.filter_by(list_id=todo_lists[0].id).order_by('id').all())    
     return render_template('index.html',
                            todo_lists = todo_lists,
                            active_todo_list = todo_list,
@@ -207,6 +211,8 @@ def get_list_todos(list_id):
 @app.route('/')
 def index():
     todo_list_data = TodoList.query.order_by('id').all()
+    if len(todo_list_data) == 0:
+        return redirect(url_for('get_list_todos', list_id=-1))
     for todo_list in todo_list_data:
         if todo_list.id == 1:
             return redirect(url_for('get_list_todos', list_id=1))
