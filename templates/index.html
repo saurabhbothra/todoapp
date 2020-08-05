@@ -60,9 +60,11 @@
                 <h3>{{ active_todo_list.name }}</h3>
                 <a href="/todos/list/{{ active_todo_list.id }}/form"><h4>Rename</h4></a>
                 <a href="/list/{{ active_todo_list.id }}/todos/create/form"><h4>Add To-Do</h4></a>
-                <form id='form'>
-                    <input type="text" id='search' name='search' placeholder="Search" />
-                </form>
+                {% if todos %}
+                    <form id='form'>
+                        <input type="text" id='search' name='search' placeholder="Search" />
+                    </form>
+                {% endif %}
                 <div id='error' class="hidden">Something went wrong!</div>
                 <ul id='todos' class="todolist">
                     {% for todo in todos %}
