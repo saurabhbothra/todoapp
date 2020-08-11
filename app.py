@@ -94,6 +94,21 @@ def rename_active_todo_list(active_todo_list_id):
         db.session.close()
     return redirect(url_for('get_list_todos', list_id=active_todo_list_id))
 
+# creating a route handler for search functionality.
+@app.route('/todo/list/<active_todo_list_id>/search/todos', methods=['POST'])
+def search_todos(active_todo_list_id):
+    match_todos = []
+    description = request.form.get('search', '')
+    todos = Todo.query.filter_by(list_id=active_todo_list_id).all()
+    for todo in todos:
+        if description.lower() in todo.description.lower():
+            match_todos.append(todo)
+    return render_template('index.html',
+                           todo_lists = TodoList.query.order_by('id').all(),
+                           active_todo_list = TodoList.query.get(active_todo_list_id),
+                           todos=match_todos)
+    
+
 # creating a route handler for marking all todos completed.
 @app.route('/list/<active_list_id>/complete/all/todos')
 def complete_all_todos(active_list_id):
